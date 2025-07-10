@@ -993,7 +993,7 @@
         <option value="Cash on Delivery">Cash on Delivery</option>
         <option value="Online Payment">Online Payment </option>
       </select>
-      <button onclick="placeOrder()">Place Order</button>
+      <button onclick="placeOrder()" onclick="redirectTopayment()" >Place Order</button>
       <button class="cancel-btn" onclick="closeModal()">Cancel</button>
     </div>
   </div>
@@ -1005,6 +1005,9 @@
   <div id="notification" class="notification"></div>
 
  <script>
+   function redirectTopayment() {
+      window.location.href =https://gouravdhdb.github.io/store/payment.html
+   }
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
     let orders = JSON.parse(localStorage.getItem('orders')) || [];
     let currentVoucherDiscount = 0;
