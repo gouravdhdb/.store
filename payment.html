@@ -44,9 +44,16 @@
   <div class="qr-box">
     <img src="qr-code.png" alt="Scan QR Code">
     <div class="upi-id">UPI: gourav@upi</div>
-    <div>Amount: ₹199</div>
+    <div id="amount">Amount: ₹0</div>
     <p class="note">Please send payment after confirmation with seller.</p>
     <a class="btn" href="thankyou.html">Payment Done</a>
   </div>
+
+  <script>
+    // Get ?amount=xxx from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const amount = urlParams.get('amount') || '0';
+    document.getElementById('amount').innerText = `Amount: ₹${amount}`;
+  </script>
 </body>
 </html>
