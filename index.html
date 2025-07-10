@@ -763,6 +763,20 @@
             height: 250px;
         }
     }
+    .call-float {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #28a745;
+  border-radius: 50%;
+  padding: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  z-index: 999;
+}
+.call-float img {
+  width: 40px;
+  height: 40px;
+}
   </style>
 </head>
 <body>
@@ -779,7 +793,9 @@
       <li onclick="showSection('vouchers')">🎟️ Vouchers</li> <li onclick="showSection('settings')">⚙️ Settings</li>
     </ul>
   </div>
-
+<a href="tel:+911613145098" class="call-float" title="Call Us">
+  <img src="call-icon.png" alt="Call Now" />
+</a>
   <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMenu()"></div>
 
   <div class="main-content-wrapper" id="mainContentWrapper">
