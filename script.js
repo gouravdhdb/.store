@@ -225,12 +225,19 @@
         currentVoucherDiscount = 0;
       }
 
-      closeModal();
-      showNotification('Order placed successfully! Details sent to Telegram.');
-      updateCartDisplay();
-      updateOrderDisplay();
-      showSection('orders');
-    }
+      if (paymentMethod === "Online Payment") {
+  // Save order cart to localStorage again just to ensure it's fresh
+  localStorage.setItem('cart', JSON.stringify(itemsToOrder));
+  setTimeout(() => {
+    window.location.href = "payment.html";
+  }, 1000); // Give user feedback before redirect
+} else {
+  closeModal();
+  showNotification('Order placed successfully! Details sent to Telegram.');
+  updateCartDisplay();
+  updateOrderDisplay();
+  showSection('orders');
+      }
 
     function updateOrderDisplay() {
       const orderHistoryContainer = document.getElementById('order-history-container');
