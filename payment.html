@@ -10,50 +10,57 @@
     }
     .qr-box {
       border: 1px solid #ccc;
-      border-radius: 10px;
-      padding: 20px;
-      display: inline-block;
-      margin-top: 50px;
-    }
-    .qr-box img {
-      width: 200px;
-      height: 200px;
-    }
-    .upi-id {
-      font-weight: bold;
-      margin: 10px 0;
-    }
-    .note {
-      color: red;
-      font-size: 14px;
-    }
-    .btn {
+      padding: 15px;
       margin-top: 20px;
+      display: inline-block;
+    }
+    .payment-buttons a {
+      display: inline-block;
+      margin: 10px;
       padding: 10px 20px;
-      background-color: green;
+      background-color: #007bff;
       color: white;
-      border: none;
-      border-radius: 5px;
-      font-size: 16px;
+      border-radius: 6px;
       text-decoration: none;
     }
   </style>
 </head>
 <body>
-  <h2>Scan & Pay</h2>
+  <h2>Complete Your Payment</h2>
+
+  <div id="product-list"></div>
+  <h3>Total: ₹<span id="total-amount">0</span></h3>
+
   <div class="qr-box">
-    <img src="qr-code.png" alt="Scan QR Code">
-    <div class="upi-id">UPI: gourav@upi</div>
-    <div id="amount">Amount: ₹0</div>
-    <p class="note">Please send payment after confirmation with seller.</p>
-    <a class="btn" href="thankyou.html">Payment Done</a>
+    <p>Scan QR Code to Pay</p>
+    <img src="qr-code.jpg" width="200" alt="QR Code"> <!-- Replace with your actual QR code image -->
+  </div>
+
+  <div class="payment-buttons">
+    <a id="upi-link" href="#" target="_blank">Pay with UPI App</a>
+    <a href="https://pay.google.com/" target="_blank">Google Pay</a>
+    <a href="https://www.phonepe.com/" target="_blank">PhonePe</a>
   </div>
 
   <script>
-    // Get ?amount=xxx from URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const amount = urlParams.get('amount') || '0';
-    document.getElementById('amount').innerText = `Amount: ₹${amount}`;
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const productList = document.getElementById('product-list');
+    const totalAmount = document.getElementById('total-amount');
+
+    let total = 0;
+
+    cart.forEach(item => {
+      const div = document.createElement('div');
+      div.innerText = `${item.name} - ₹${item.price} x ${item.quantity}`;
+      productList.appendChild(div);
+      total += item.price * item.quantity;
+    });
+
+    totalAmount.innerText = total;
+
+    const upiId = "yourupiid@okaxis"; // ← Replace with your real UPI ID
+    const upiLink = document.getElementById("upi-link");
+    upiLink.href = `upi://pay?pa=${upiId}&pn=TheDecken&am=${total}&cu=INR`;
   </script>
 </body>
 </html>
