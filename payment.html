@@ -38,8 +38,6 @@
 
   <div class="payment-buttons">
     <a id="upi-link" href="#" target="_blank">Pay with UPI App</a>
-    <a href="https://pay.google.com/" target="_blank">Google Pay</a>
-    <a href="https://www.phonepe.com/" target="_blank">PhonePe</a>
   </div>
 
   <script>
@@ -58,7 +56,7 @@
 
     totalAmount.innerText = total;
 
-    const upiId = "yourupiid@okaxis"; // ← Replace with your real UPI ID
+    const upiId = "9988720946@ybl"; // ← Replace with your real UPI ID
     const upiLink = document.getElementById("upi-link");
     upiLink.href = `upi://pay?pa=${upiId}&pn=TheDecken&am=${total}&cu=INR`;
   </script>
