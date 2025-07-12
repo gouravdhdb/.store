@@ -1,103 +1,68 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Pay Online - The Decken</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>UPI Payment - The Decken</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      text-align: center;
+      background: #f2f2f2;
       padding: 20px;
+      text-align: center;
     }
-    .qr-box {
-      border: 1px solid #ccc;
+    .container {
+      background: #fff;
+      border-radius: 12px;
+      padding: 30px;
+      max-width: 400px;
+      margin: 50px auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .upi-btn {
+      display: block;
+      width: 100%;
+      background: #4CAF50;
+      color: white;
       padding: 15px;
       margin-top: 20px;
-      display: inline-block;
-    }
-    .payment-buttons a {
-      display: inline-block;
-      margin: 10px;
-      padding: 10px 20px;
-      background-color: #007bff;
-      color: white;
-      border-radius: 6px;
+      border: none;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
       text-decoration: none;
+    }
+    .return-btn {
+      background: #007bff;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <h2>Complete Your Payment</h2>
+  <div class="container">
+    <h2>Complete UPI Payment</h2>
+    <p id="amountText"></p>
 
-  <div id="product-list"></div>
-  <h3>Total: ₹<span id="total-amount">0</span></h3>
+    <a id="upiLink" class="upi-btn">Pay with UPI App</a>
 
-  <div class="qr-box">
-    <p>Scan QR Code to Pay</p>
-    <img src="qr-code.jpg" width="200" alt="QR Code"> <!-- Replace with your actual QR code image -->
-  </div>
-
-  <div class="payment-buttons">
-    <a id="upi-link" href="#" target="_blank">Pay with UPI App</a>
-  </div>
-  
-  <div style="margin-top: 30px;">
-  <button onclick="confirmPayment()" style="padding: 15px 30px; font-size: 1.1rem; background-color: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer;">Confirm Payment & Place Order</button>
+    <button class="upi-btn return-btn" onclick="returnToStore()">✅ I have completed the payment</button>
   </div>
 
   <script>
-    const cart = JSON.parse(localStorage.getItem('cart')) || [];
-    const productList = document.getElementById('product-list');
-    const totalAmount = document.getElementById('total-amount');
+    const urlParams = new URLSearchParams(window.location.search);
+    const amount = urlParams.get('amount') || '0';
+    const upi = urlParams.get('upi') || 'example@upi';
+    const returnUrl = decodeURIComponent(urlParams.get('return') || '/');
+    const productData = decodeURIComponent(urlParams.get('data') || '[]');
 
-    let total = 0;
+    document.getElementById('amountText').textContent = `Pay ₹${amount} to: ${upi}`;
 
-    cart.forEach(item => {
-      const div = document.createElement('div');
-      div.innerText = `${item.name} - ₹${item.price} x ${item.quantity}`;
-      productList.appendChild(div);
-      total += item.price * item.quantity;
-    });
+    const upiUrl = `upi://pay?pa=${upi}&pn=TheDecken&am=${amount}&cu=INR`;
+    document.getElementById('upiLink').href = upiUrl;
 
-    totalAmount.innerText = total;
-
-    const upiId = "9988720946@fam"; // ← Replace with your real UPI ID
-    const upiLink = document.getElementById("upi-link");
-    upiLink.href = `upi://pay?pa=${upiId}&pn=TheDecken&am=${total}&cu=INR`;
-    
-    function confirmPayment() {
-  const pendingOrder = JSON.parse(localStorage.getItem('pendingOrder'));
-  if (!pendingOrder) {
-    alert("No pending order found.");
-    return;
-  }
-
-  // Load existing orders
-  const existingOrders = JSON.parse(localStorage.getItem('orders')) || [];
-  existingOrders.unshift(pendingOrder);
-  localStorage.setItem('orders', JSON.stringify(existingOrders));
-
-  // Send to Telegram (optional)
-  fetch(`https://api.telegram.org/bot7942211815:AAGo9GylL7zO_SUWWkqJn1AFH40DO-Q0cqY/sendMessage`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      chat_id: '-4891793325',
-      text: `🛒 New Online Payment Order from ${pendingOrder.customer.name}
-📍 Address: ${pendingOrder.customer.address}
-📞 Phone: ${pendingOrder.customer.phone}
-💳 Payment: ${pendingOrder.paymentMethod}
-📦 Items: ${pendingOrder.items.map(i => `${i.name} (x${i.quantity}) - ₹${i.price * i.quantity}`).join(', ')}
-💰 Total: ₹${pendingOrder.total}
-🧾 Discount: ₹${pendingOrder.discountApplied}`
-    })
-  });
-
-  // Clean up
-  localStorage.removeItem('pendingOrder');
-  localStorage.removeItem('cart');
-
-  alert("Payment confirmed and order placed successfully!");
-  window.location.href = "index.html";
+    function returnToStore() {
+      // Redirect with ?paid=true to complete order
+      window.location.href = returnUrl;
     }
   </script>
 </body>
