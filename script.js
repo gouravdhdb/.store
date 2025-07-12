@@ -186,17 +186,21 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
       if (paymentMethod === "online") {
-  const paymentData = {
+  const newOrder = {
+    id: Date.now(),
     items: itemsToOrder,
     total: orderTotal,
-    name,
-    address,
-    phone
+    discountApplied: currentVoucherDiscount,
+    customer: { name, address, phone, upiId },
+    paymentMethod: paymentMethod,
+    date: new Date().toLocaleString(),
+    status: 'Pending'
   };
-  localStorage.setItem("paymentData", JSON.stringify(paymentData));
+
+  localStorage.setItem("pendingOrder", JSON.stringify(newOrder));
   closeModal();
   window.location.href = "payment.html";
-  return;
+  return; // stop further execution
       }
 
       let itemsToOrder = [];
