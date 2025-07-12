@@ -164,19 +164,77 @@
       document.getElementById('upi-input').value = '';
       document.getElementById('payment-method-select').value = '';
     }
+async function placeOrder() {
+  const name = document.getElementById('name-input').value.trim();
+  const address = document.getElementById('address-input').value.trim();
+  const phone = document.getElementById('phone-input').value.trim();
+  const upiId = document.getElementById('upi-input').value.trim();
+  const paymentMethod = document.getElementById('payment-method-select').value;
 
-    async function placeOrder() {
-      const name = document.getElementById('name-input').value.trim();
-      const address = document.getElementById('address-input').value.trim();
-      const phone = document.getElementById('phone-input').value.trim();
-      const upiId = document.getElementById('upi-input').value.trim();
-      const paymentMethod = document.getElementById('payment-method-select').value;
+  if (!name || !address || !phone || !paymentMethod) {
+    alert('Please fill in all delivery details and select a payment method.');
+    return;
+  }
 
-      if (!name || !address || !phone || !paymentMethod) {
-        showNotification('Please fill in all delivery details and select a payment method.', false);
-        return;
-      }
+  let itemsToOrder = [];
+  let orderTotal = 0;
 
+  if (document.getElementById('modal-title').textContent.includes('Cart')) {
+    itemsToOrder = [...cart];
+    orderTotal = parseFloat(document.getElementById('final-cart-total').textContent);
+  } else {
+    const productName = document.getElementById('modal-title').textContent.split(' for ')[0].replace('Buy ', '');
+    const productPrice = parseFloat(document.getElementById('modal-title').textContent.split('₹')[1]);
+    itemsToOrder = [{ name: productName, price: productPrice, quantity: 1 }];
+    orderTotal = productPrice;
+  }
+
+  const orderData = {
+    id: Date.now(),
+    items: itemsToOrder,
+    total: orderTotal,
+    discountApplied: currentVoucherDiscount,
+    customer: { name, address, phone, upiId },
+    paymentMethod: paymentMethod,
+    date: new Date().toLocaleString(),
+    status: 'Pending'
+  };
+
+  if (paymentMethod === "Online Payment") {
+    localStorage.setItem("pendingOrder", JSON.stringify(orderData));
+    localStorage.setItem("cart", JSON.stringify(itemsToOrder));
+    window.location.href = "payment.html";
+    return;
+  }
+
+  orders.unshift(orderData);
+  localStorage.setItem("orders", JSON.stringify(orders));
+
+  await fetch(`https://api.telegram.org/bot7942211815:AAGo9GylL7zO_SUWWkqJn1AFH40DO-Q0cqY/sendMessage`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      chat_id: '-4891793325',
+      text: `🛒 New Order from ${name}
+📍 Address: ${address}
+📞 Phone: ${phone}
+💳 Payment: ${paymentMethod}
+📦 Items: ${itemsToOrder.map(i => `${i.name} (x${i.quantity}) - ₹${i.price * i.quantity}`).join(', ')}
+💰 Total: ₹${orderTotal}
+🧾 Discount: ₹${currentVoucherDiscount}`
+    })
+  });
+
+  cart = [];
+  localStorage.setItem('cart', JSON.stringify(cart));
+  currentVoucherDiscount = 0;
+
+  closeModal();
+  alert('Order placed successfully! Details sent to Telegram.');
+  updateCartDisplay();
+  updateOrderDisplay();
+  showSection('orders');
+}
       let itemsToOrder = [];
       let orderTotal = 0;
 
@@ -209,72 +267,7 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           chat_id: '-4891793325',
-          text: `🛒 New Order from ${name}
-📍 Address: ${address}
-📞 Phone: ${phone}
-💳 Payment: ${paymentMethod}
-📦 Items: ${itemsToOrder.map(i => `${i.name} (x${i.quantity}) - ₹${i.price * i.quantity}`).join(', ')}
-💰 Total: ₹${orderTotal}
-🧾 Discount: ₹${currentVoucherDiscount}`
-        })
-      });
 
-      if (document.getElementById('modal-title').textContent.includes('Cart')) {
-        cart = [];
-        localStorage.setItem('cart', JSON.stringify(cart));
-        currentVoucherDiscount = 0;
-
-          if (paymentMethod === "Online Payment") {
-  // Save order cart to localStorage again just to ensure it's fresh
-  localStorage.setItem('cart', JSON.stringify(itemsToOrder));
-  setTimeout(() => {
-    window.location.href = "payment.html";
-  }, 1000); // Give user feedback before redirect
-} else {
-  closeModal();
-  showNotification('Order placed successfully! Details sent to Telegram.');
-  updateCartDisplay();
-  updateOrderDisplay();
-  showSection('orders');
-          }
-
-    function updateOrderDisplay() {
-      const orderHistoryContainer = document.getElementById('order-history-container');
-      const emptyOrdersMessage = document.getElementById('empty-orders-message');
-      orderHistoryContainer.innerHTML = '';
-
-      if (orders.length === 0) {
-        emptyOrdersMessage.style.display = 'block';
-      } else {
-        emptyOrdersMessage.style.display = 'none';
-        orders.forEach(order => {
-          const orderDiv = document.createElement('div');
-          orderDiv.classList.add('order-item');
-          const itemsList = order.items.map(item => `${item.name} (x${item.quantity}) - ₹${item.price * item.quantity}`).join('<br>');
-          const discountInfo = order.discountApplied > 0 ? `<p style="color: var(--button-secondary); font-size:0.9rem;">Discount: -₹${order.discountApplied.toFixed(2)}</p>` : '';
-          const upiInfo = order.customer.upiId ? `<p style="font-size: 0.9rem; color: var(--secondary);">UPI ID: ${order.customer.upiId}</p>` : '';
-
-          orderDiv.innerHTML = `
-            <div class="order-item-details">
-              <h4>Order ID: #${order.id}</h4>
-              <p>Items: <br>${itemsList}</p>
-              <p>Total: ₹${order.total.toFixed(2)}</p>
-              ${discountInfo}
-              <p style="font-size: 0.9rem; color: var(--secondary);">Placed on: ${order.date}</p>
-              <p style="font-size: 0.9rem; color: var(--secondary);">Payment: ${order.paymentMethod}</p>
-              <p style="font-size: 0.9rem; color: var(--secondary);">Name: ${order.customer.name}</p>
-              <p style="font-size: 0.9rem; color: var(--secondary);">Address: ${order.customer.address}</p>
-              <p style="font-size: 0.9rem; color: var(--secondary);">Phone: ${order.customer.phone}</p>
-              ${upiInfo}
-            </div>
-            <div class="order-item-tracking">
-              <p>Status: <span style="font-weight: 600; color: ${order.status === 'Pending' ? '#ffc107' : '#28a745'}">${order.status}</span></p>
-            </div>
-          `;
-          orderHistoryContainer.appendChild(orderDiv);
-        });
-      }
-    }
 
     const darkModeToggle = document.getElementById('darkModeToggle');
     darkModeToggle.addEventListener('change', () => {
