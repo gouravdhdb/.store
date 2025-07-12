@@ -357,11 +357,13 @@ document.addEventListener('DOMContentLoaded', () => {
 document.addEventListener('DOMContentLoaded', () => {
   const paymentSelect = document.getElementById('payment-method-select');
 
-  if (paymentSelect) {
-    paymentSelect.addEventListener('change', () => {
-      if (paymentSelect.value === 'Online Payment') {
-        window.open('payment.html', '_blank', 'width=600,height=600');
-      }
+  if (paymentMethod === "online") {
+  ...
+  localStorage.setItem("pendingOrder", JSON.stringify(newOrder));
+  closeModal();
+  window.location.href = "payment.html";
+  return;
+  }
     });
   }
 });
