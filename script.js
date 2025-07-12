@@ -214,20 +214,24 @@ async function placeOrder() {
 
     orders.unshift(newOrder);
     localStorage.setItem('orders', JSON.stringify(orders));
-
+const isPaid = paymentMethod === 'Online Payment'
+  ? '✅ Payment Received (Online)'
+  : '❌ Payment Pending (COD)';
     try {
         await fetch(`https://api.telegram.org/bot7942211815:AAGo9GylL7zO_SUWWkqJn1AFH40DO-Q0cqY/sendMessage`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                chat_id: '-4891793325',
-                text: `🛒 New Order from ${name}
+                chat_id: '-4891793325',text: `🛒 New Order from ${name}
 📍 Address: ${address}
 📞 Phone: ${phone}
 💳 Payment: ${paymentMethod}
+🆔 UPI ID: ${upiId}
 📦 Items: ${itemsToOrder.map(i => `${i.name} (x${i.quantity}) - ₹${i.price * i.quantity}`).join(', ')}
 💰 Total: ₹${orderTotal}
-🧾 Discount: ₹${currentVoucherDiscount}`
+🧾 Discount: ₹${currentVoucherDiscount}
+${isPaid}`
+          
             })
         });
         alert('Order placed successfully! Details sent to Telegram.');
@@ -237,8 +241,14 @@ async function placeOrder() {
 
     cart = [];
     localStorage.setItem('cart', JSON.stringify(cart));
-    currentVoucherDiscount = 0;
+    currentVoucherDiscount = 0;if (paymentMethod === 'Online Payment') {
+    const amount = orderTotal.toFixed(2);
+    const upiAppUrl = `upi://pay?pa=${upiId}&pn=TheDecken&am=${amount}&cu=INR`;
 
+    // Try to open in UPI app
+    window.location.href = upiAppUrl;
+    return;
+}
     closeModal();
     updateCartDisplay();
     updateOrderDisplay();
@@ -309,4 +319,4 @@ function applyVoucher() {
     voucherMessage.classList.add('success');
 
     updateCartDisplay();
-                         }
+            }
