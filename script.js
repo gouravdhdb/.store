@@ -175,43 +175,6 @@ async function placeOrder() {
     alert('Please fill in all delivery details and select a payment method.');
     return;
   }
-
-  let itemsToOrder = [];
-  let orderTotal = 0;
-
-  if (document.getElementById('modal-title').textContent.includes('Cart')) {
-    itemsToOrder = [...cart];
-    orderTotal = parseFloat(document.getElementById('final-cart-total').textContent);
-  } else {
-    const productName = document.getElementById('modal-title').textContent.split(' for ')[0].replace('Buy ', '');
-    const productPrice = parseFloat(document.getElementById('modal-title').textContent.split('₹')[1]);
-    itemsToOrder = [{ name: productName, price: productPrice, quantity: 1 }];
-    orderTotal = productPrice;
-  }
-
-  const orderData = {
-    id: Date.now(),
-    items: itemsToOrder,
-    total: orderTotal,
-    discountApplied: currentVoucherDiscount,
-    customer: { name, address, phone, upiId },
-    paymentMethod: paymentMethod,
-    date: new Date().toLocaleString(),
-    status: 'Pending'
-  };
-
-  if (paymentMethod === "Online Payment") {
-    localStorage.setItem("pendingOrder", JSON.stringify(orderData));
-    localStorage.setItem("cart", JSON.stringify(itemsToOrder));
-    window.location.href = "payment.html";
-    return;
-  }
-
-  orders.unshift(orderData);
-  localStorage.setItem("orders", JSON.stringify(orders));
-
-  await fetch(`https://api.telegram.org/bot7942211815:AAGo9GylL7zO_SUWWkqJn1AFH40DO-Q0cqY/sendMessage`, {
-    method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       chat_id: '-4891793325',
