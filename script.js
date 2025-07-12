@@ -223,21 +223,23 @@
         cart = [];
         localStorage.setItem('cart', JSON.stringify(cart));
         currentVoucherDiscount = 0;
-      }
 
-      if (paymentMethod === "Online Payment") {
-  // Save order cart to localStorage again just to ensure it's fresh
-  localStorage.setItem('cart', JSON.stringify(itemsToOrder));
-  setTimeout(() => {
-    window.location.href = "payment.html";
-  }, 1000); // Give user feedback before redirect
-} else {
-  closeModal();
-  showNotification('Order placed successfully! Details sent to Telegram.');
-  updateCartDisplay();
-  updateOrderDisplay();
-  showSection('orders');
-      }
+          if (paymentMethod === "Online Payment") {
+  const tempOrder = {
+    id: Date.now(),
+    items: itemsToOrder,
+    total: orderTotal,
+    discountApplied: currentVoucherDiscount,
+    customer: { name, address, phone, upiId },
+    paymentMethod: paymentMethod,
+    date: new Date().toLocaleString(),
+    status: 'Pending'
+  };
+
+  localStorage.setItem('pendingOrder', JSON.stringify(tempOrder));
+  window.location.href = "payment.html";
+  return; // Stop here; don't place order yet
+          }
 
     function updateOrderDisplay() {
       const orderHistoryContainer = document.getElementById('order-history-container');
