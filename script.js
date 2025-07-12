@@ -225,12 +225,17 @@
         currentVoucherDiscount = 0;
 
           if (paymentMethod === "Online Payment") {
+  // Save order cart to localStorage again just to ensure it's fresh
   localStorage.setItem('cart', JSON.stringify(itemsToOrder));
   setTimeout(() => {
     window.location.href = "payment.html";
-  }, 1000);
+  }, 1000); // Give user feedback before redirect
 } else {
-  // existing code to place COD orders
+  closeModal();
+  showNotification('Order placed successfully! Details sent to Telegram.');
+  updateCartDisplay();
+  updateOrderDisplay();
+  showSection('orders');
           }
 
     function updateOrderDisplay() {
