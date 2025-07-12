@@ -1,12 +1,3 @@
-let cart = JSON.parse(localStorage.getItem('cart')) || [];
-let orders = JSON.parse(localStorage.getItem('orders')) || [];
-let currentVoucherDiscount = 0;
-
-document.addEventListener('DOMContentLoaded', () => {
-  updateCartDisplay();
-  updateOrderDisplay();
-  showSection('home');
-});
 
     const vouchersData = {
         "SAVE10": { type: "percentage", value: 2.10, used: false, minCartValue: 100 },
@@ -185,23 +176,6 @@ document.addEventListener('DOMContentLoaded', () => {
         showNotification('Please fill in all delivery details and select a payment method.', false);
         return;
       }
-      if (paymentMethod === "online") {
-  const newOrder = {
-    id: Date.now(),
-    items: itemsToOrder,
-    total: orderTotal,
-    discountApplied: currentVoucherDiscount,
-    customer: { name, address, phone, upiId },
-    paymentMethod: paymentMethod,
-    date: new Date().toLocaleString(),
-    status: 'Pending'
-  };
-
-  localStorage.setItem("pendingOrder", JSON.stringify(newOrder));
-  closeModal();
-  window.location.href = "payment.html";
-  return; // stop further execution
-      }
 
       let itemsToOrder = [];
       let orderTotal = 0;
@@ -249,14 +223,23 @@ document.addEventListener('DOMContentLoaded', () => {
         cart = [];
         localStorage.setItem('cart', JSON.stringify(cart));
         currentVoucherDiscount = 0;
-      }
 
-      closeModal();
-      showNotification('Order placed successfully! Details sent to Telegram.');
-      updateCartDisplay();
-      updateOrderDisplay();
-      showSection('orders');
-    }
+          if (paymentMethod === "Online Payment") {
+  const tempOrder = {
+    id: Date.now(),
+    items: itemsToOrder,
+    total: orderTotal,
+    discountApplied: currentVoucherDiscount,
+    customer: { name, address, phone, upiId },
+    paymentMethod: paymentMethod,
+    date: new Date().toLocaleString(),
+    status: 'Pending'
+  };
+
+  localStorage.setItem('pendingOrder', JSON.stringify(tempOrder));
+  window.location.href = "payment.html";
+  return; // Stop here; don't place order yet
+          }
 
     function updateOrderDisplay() {
       const orderHistoryContainer = document.getElementById('order-history-container');
@@ -353,17 +336,4 @@ document.addEventListener('DOMContentLoaded', () => {
         voucherMessage.classList.add('success');
 
         updateCartDisplay();
-          }
-document.addEventListener('DOMContentLoaded', () => {
-  const paymentSelect = document.getElementById('payment-method-select');
-
-  if (paymentMethod === "online") {
-  ...
-  localStorage.setItem("pendingOrder", JSON.stringify(newOrder));
-  closeModal();
-  window.location.href = "payment.html";
-  return;
-  }
-    });
-  }
-});
+    }
