@@ -2,6 +2,12 @@ let cart = JSON.parse(localStorage.getItem('cart')) || [];
 let orders = JSON.parse(localStorage.getItem('orders')) || [];
 let currentVoucherDiscount = 0;
 
+document.addEventListener('DOMContentLoaded', () => {
+  updateCartDisplay();
+  updateOrderDisplay();
+  showSection('home');
+});
+
     const vouchersData = {
         "SAVE10": { type: "percentage", value: 2.10, used: false, minCartValue: 100 },
         "FLAT50": { type: "flat", value: 25, used: false, minCartValue: 200 },
