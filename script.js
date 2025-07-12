@@ -225,20 +225,12 @@
         currentVoucherDiscount = 0;
 
           if (paymentMethod === "Online Payment") {
-  const tempOrder = {
-    id: Date.now(),
-    items: itemsToOrder,
-    total: orderTotal,
-    discountApplied: currentVoucherDiscount,
-    customer: { name, address, phone, upiId },
-    paymentMethod: paymentMethod,
-    date: new Date().toLocaleString(),
-    status: 'Pending'
-  };
-
-  localStorage.setItem('pendingOrder', JSON.stringify(tempOrder));
-  window.location.href = "payment.html";
-  return; // Stop here; don't place order yet
+  localStorage.setItem('cart', JSON.stringify(itemsToOrder));
+  setTimeout(() => {
+    window.location.href = "payment.html";
+  }, 1000);
+} else {
+  // existing code to place COD orders
           }
 
     function updateOrderDisplay() {
