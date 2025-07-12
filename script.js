@@ -327,4 +327,4 @@
         voucherMessage.classList.add('success');
 
         updateCartDisplay();
-}
+          }
