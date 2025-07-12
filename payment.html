@@ -39,6 +39,10 @@
   <div class="payment-buttons">
     <a id="upi-link" href="#" target="_blank">Pay with UPI App</a>
   </div>
+  
+  <div style="margin-top: 30px;">
+  <button onclick="confirmPayment()" style="padding: 15px 30px; font-size: 1.1rem; background-color: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer;">Confirm Payment & Place Order</button>
+  </div>
 
   <script>
     const cart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -59,6 +63,42 @@
     const upiId = "9988720946@ybl"; // ← Replace with your real UPI ID
     const upiLink = document.getElementById("upi-link");
     upiLink.href = `upi://pay?pa=${upiId}&pn=TheDecken&am=${total}&cu=INR`;
+    
+    function confirmPayment() {
+  const pendingOrder = JSON.parse(localStorage.getItem('pendingOrder'));
+  if (!pendingOrder) {
+    alert("No pending order found.");
+    return;
+  }
+
+  // Load existing orders
+  const existingOrders = JSON.parse(localStorage.getItem('orders')) || [];
+  existingOrders.unshift(pendingOrder);
+  localStorage.setItem('orders', JSON.stringify(existingOrders));
+
+  // Send to Telegram (optional)
+  fetch(`https://api.telegram.org/bot7942211815:AAGo9GylL7zO_SUWWkqJn1AFH40DO-Q0cqY/sendMessage`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      chat_id: '-4891793325',
+      text: `🛒 New Online Payment Order from ${pendingOrder.customer.name}
+📍 Address: ${pendingOrder.customer.address}
+📞 Phone: ${pendingOrder.customer.phone}
+💳 Payment: ${pendingOrder.paymentMethod}
+📦 Items: ${pendingOrder.items.map(i => `${i.name} (x${i.quantity}) - ₹${i.price * i.quantity}`).join(', ')}
+💰 Total: ₹${pendingOrder.total}
+🧾 Discount: ₹${pendingOrder.discountApplied}`
+    })
+  });
+
+  // Clean up
+  localStorage.removeItem('pendingOrder');
+  localStorage.removeItem('cart');
+
+  alert("Payment confirmed and order placed successfully!");
+  window.location.href = "index.html";
+    }
   </script>
 </body>
 </html>
