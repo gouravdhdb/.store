@@ -1,3 +1,6 @@
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
+let orders = JSON.parse(localStorage.getItem('orders')) || [];
+let currentVoucherDiscount = 0;
 
     const vouchersData = {
         "SAVE10": { type: "percentage", value: 2.10, used: false, minCartValue: 100 },
