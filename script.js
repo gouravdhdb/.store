@@ -185,6 +185,19 @@ document.addEventListener('DOMContentLoaded', () => {
         showNotification('Please fill in all delivery details and select a payment method.', false);
         return;
       }
+      if (paymentMethod === "online") {
+  const paymentData = {
+    items: itemsToOrder,
+    total: orderTotal,
+    name,
+    address,
+    phone
+  };
+  localStorage.setItem("paymentData", JSON.stringify(paymentData));
+  closeModal();
+  window.location.href = "payment.html";
+  return;
+      }
 
       let itemsToOrder = [];
       let orderTotal = 0;
